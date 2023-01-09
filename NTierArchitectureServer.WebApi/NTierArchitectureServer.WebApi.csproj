@@ -18,10 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\NTierArchitectureServer.Business\NTierArchitectureServer.Business.csproj" />
     <ProjectReference Include="..\NTierArchitectureServer.DataAccess\NTierArchitectureServer.DataAccess.csproj" />
   </ItemGroup>
 

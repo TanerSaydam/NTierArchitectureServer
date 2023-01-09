@@ -20,7 +20,7 @@ namespace NTierArchitectureServer.DataAccess.Repositories
         IQueryable<T> GetAll();
         IQueryable<T> GetWhere(Expression<Func<T, bool>> expression);
         Task<T> FindFirstAsync(Expression<Func<T, bool>> expression);
-        Task<T> FirsAsync();
+        Task<T> GetFirstAsync();
         #endregion
     }
 }

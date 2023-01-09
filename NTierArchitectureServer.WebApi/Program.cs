@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using NTierArchitectureServer.Business.Services.EmailSettingServices;
 using NTierArchitectureServer.DataAccess.Context;
+using NTierArchitectureServer.DataAccess.Repositories;
 using NTierArchitectureServer.DataAccess.Repositories.EmailSettingRepository;
 using NTierArchitectureServer.Entities.Models;
 using NTierArchitectureServer.Entities.Models.Identity;
@@ -11,7 +13,12 @@ using NTierArchitectureServer.WebApi.Options;
 var builder = WebApplication.CreateBuilder(args);
 
 #region DataAccess Dependency Injection
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IEmailSettingRepository, EmailSettingRepository>();
+#endregion
+
+#region Business Dependency Injection
+builder.Services.AddScoped<IEmailSettingService,EmailSettingService>();
 #endregion
 
 #region ConfigureOptions
@@ -27,12 +34,14 @@ builder.Services.AddDbContext<AppDbContext>((sp,options) =>
 builder.Services.AddIdentity<AppUser,AppRole>().AddEntityFrameworkStores<AppDbContext>();
 #endregion
 
-// Add services to the container.
-
+#region Application
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+#endregion
+
+#region Swagger
 builder.Services.AddSwaggerGen();
+#endregion
 
 var app = builder.Build();
 

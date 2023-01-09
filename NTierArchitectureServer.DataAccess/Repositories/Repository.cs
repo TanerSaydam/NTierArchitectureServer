@@ -65,7 +65,7 @@ namespace NTierArchitectureServer.DataAccess.Repositories
             return await Entity.FirstOrDefaultAsync(expression);
         }
 
-        public async Task<T> FirsAsync()
+        public async Task<T> GetFirstAsync()
         {
             return await Entity.FirstOrDefaultAsync();
         }
