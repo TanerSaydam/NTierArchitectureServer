@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace NTierArchitectureServer.DataAccess.Repositories
 {
-    internal interface IRepository<T> where T: BaseEntity, new()
+    public interface IRepository<T> where T: BaseEntity
     {
         #region Commands
         DbSet<T> Entity { get; }
