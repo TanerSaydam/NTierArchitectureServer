@@ -18,9 +18,16 @@ namespace NTierArchitectureServer.Business.Services.AuthServices
             _userManager = userManager;
         }
 
-        public Task LoginAsync(LoginDto loginDto)
+        public async Task LoginAsync(LoginDto loginDto)
         {
-            throw new NotImplementedException();
+            var user = await _userManager.FindByEmailAsync(loginDto.EmailorUserName);
+            if (user == null)
+                user = await _userManager.FindByNameAsync(loginDto.EmailorUserName);
+
+            if (user == null)
+                throw new Exception("Kullanıcı bulunamadı!");
+
+            //token işlemleri
         }
 
         public async Task<ResultDto> RegisterAsync(RegisterDto registerDto)

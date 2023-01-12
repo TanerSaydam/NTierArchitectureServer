@@ -27,5 +27,13 @@ namespace NTierArchitectureServer.WebApi.Controllers
 
             return NoContent();
         }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Login(LoginDto loginDto)
+        {
+            await _authService.LoginAsync(loginDto);
+            //düzeltilecek
+            return Ok();
+        }
     }
 }
