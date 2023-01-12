@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using NTierArchitectureServer.Business.Services.AuthServices;
 using NTierArchitectureServer.Business.Services.EmailSettingServices;
 using NTierArchitectureServer.DataAccess.Context;
 using NTierArchitectureServer.DataAccess.Repositories;
@@ -19,6 +20,7 @@ builder.Services.AddScoped<IEmailSettingRepository, EmailSettingRepository>();
 
 #region Business Dependency Injection
 builder.Services.AddScoped<IEmailSettingService,EmailSettingService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 #endregion
 
 #region ConfigureOptions
@@ -31,7 +33,10 @@ builder.Services.AddDbContext<AppDbContext>((sp,options) =>
     var dbOptions = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
     options.UseSqlServer(dbOptions.MSSqlConnectionString);
 });
-builder.Services.AddIdentity<AppUser,AppRole>().AddEntityFrameworkStores<AppDbContext>();
+builder.Services.AddIdentity<AppUser, AppRole>(options =>
+{
+    options.User.RequireUniqueEmail= true;    
+}).AddEntityFrameworkStores<AppDbContext>();
 #endregion
 
 #region Application
