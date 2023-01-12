@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTierArchitectureServer.Dat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTierArchitectureServer.Entities", "NTierArchitectureServer.Entities\NTierArchitectureServer.Entities.csproj", "{0A99C9C6-54FA-4A91-B99B-BBC1D0D3A14D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTierArchitectureServer.Business", "NTierArchitectureServer.Business\NTierArchitectureServer.Business.csproj", "{F8F5D44D-2422-4B9A-A5AF-5ED181E9F1FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTierArchitectureServer.Business", "NTierArchitectureServer.Business\NTierArchitectureServer.Business.csproj", "{F8F5D44D-2422-4B9A-A5AF-5ED181E9F1FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTierArchitectureServer.Core", "NTierArchitectureServer.Core\NTierArchitectureServer.Core.csproj", "{C5F60D00-FB4D-4A0E-8672-5003C6D54991}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{F8F5D44D-2422-4B9A-A5AF-5ED181E9F1FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8F5D44D-2422-4B9A-A5AF-5ED181E9F1FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8F5D44D-2422-4B9A-A5AF-5ED181E9F1FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5F60D00-FB4D-4A0E-8672-5003C6D54991}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5F60D00-FB4D-4A0E-8672-5003C6D54991}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5F60D00-FB4D-4A0E-8672-5003C6D54991}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5F60D00-FB4D-4A0E-8672-5003C6D54991}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

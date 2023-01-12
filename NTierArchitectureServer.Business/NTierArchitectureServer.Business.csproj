@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\NTierArchitectureServer.DataAccess\NTierArchitectureServer.DataAccess.csproj" />
     <ProjectReference Include="..\NTierArchitectureServer.Entities\NTierArchitectureServer.Entities.csproj" />
   </ItemGroup>

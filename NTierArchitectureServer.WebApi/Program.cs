@@ -1,8 +1,11 @@
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NTierArchitectureServer.Business.Services.AuthServices;
+using NTierArchitectureServer.Business.Services.AuthServices.Validators;
 using NTierArchitectureServer.Business.Services.EmailSettingServices;
+using NTierArchitectureServer.Core.Validation;
 using NTierArchitectureServer.DataAccess.Context;
 using NTierArchitectureServer.DataAccess.Repositories;
 using NTierArchitectureServer.DataAccess.Repositories.EmailSettingRepository;
@@ -40,7 +43,14 @@ builder.Services.AddIdentity<AppUser, AppRole>(options =>
 #endregion
 
 #region Application
-builder.Services.AddControllers();
+#pragma warning disable CS0618 // Type or member is obsolete
+builder.Services.AddControllers(options=> options.Filters.Add<ValidationFilter>())
+    .AddFluentValidation(configuration => configuration
+    .RegisterValidatorsFromAssemblyContaining<RegisterValidator>()
+    .RegisterValidatorsFromAssemblyContaining<LoginValidator>()
+    )
+    .ConfigureApiBehaviorOptions(options=> options.SuppressModelStateInvalidFilter = true);
+#pragma warning restore CS0618 // Type or member is obsolete
 builder.Services.AddEndpointsApiExplorer();
 #endregion
 

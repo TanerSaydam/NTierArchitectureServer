@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.1" />
@@ -19,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NTierArchitectureServer.Business\NTierArchitectureServer.Business.csproj" />
+    <ProjectReference Include="..\NTierArchitectureServer.Core\NTierArchitectureServer.Core.csproj" />
     <ProjectReference Include="..\NTierArchitectureServer.DataAccess\NTierArchitectureServer.DataAccess.csproj" />
   </ItemGroup>
 
