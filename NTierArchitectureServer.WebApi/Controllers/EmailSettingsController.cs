@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NTierArchitectureServer.Business.Services.EmailSettingServices;
+using NTierArchitectureServer.Business.Services.EmailSettingServices.Dtos;
 using NTierArchitectureServer.Entities.Models;
 
 namespace NTierArchitectureServer.WebApi.Controllers
@@ -23,9 +24,9 @@ namespace NTierArchitectureServer.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(EmailSetting emailSetting)
+        public async Task<IActionResult> Update(EmailSettingDto emailSettingDto)
         {
-            await _emailSettingService.UpdateAsync(emailSetting);
+            await _emailSettingService.UpdateAsync(emailSettingDto);
             return NoContent();
         }
     }
