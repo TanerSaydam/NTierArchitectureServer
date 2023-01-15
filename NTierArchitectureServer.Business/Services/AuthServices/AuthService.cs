@@ -1,23 +1,22 @@
-﻿using GenericFileService.Files;
+﻿using GenericEmailService;
 using Microsoft.AspNetCore.Identity;
 using NTierArchitectureServer.Business.Services.AuthServices.Dtos;
-using NTierArchitectureServer.Business.Services.UserServices.Dtos;
+using NTierArchitectureServer.Business.Services.EmailSettingServices;
+using NTierArchitectureServer.Business.Services.EmailTemplateServices;
 using NTierArchitectureServer.Entities.Models.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NTierArchitectureServer.Business.Services.AuthServices
 {
     public class AuthService : IAuthService
     {
         private readonly UserManager<AppUser> _userManager;
-
-        public AuthService(UserManager<AppUser> userManager)
+        private readonly IEmailSettingService _emailSettingService;
+        private readonly IEmailTemplateService _emailTemplateService;
+        public AuthService(UserManager<AppUser> userManager, IEmailSettingService emailSettingService, IEmailTemplateService emailTemplateService)
         {
             _userManager = userManager;
+            _emailSettingService = emailSettingService;
+            _emailTemplateService = emailTemplateService;
         }
 
         public async Task LoginAsync(LoginDto loginDto)
@@ -50,6 +49,8 @@ namespace NTierArchitectureServer.Business.Services.AuthServices
             };
             IdentityResult result= await _userManager.CreateAsync(appUser,registerDto.Password);
 
+            await SendConfirmEmail(registerDto.Email);
+
             ResultDto resultDto = new ResultDto();
 
             if (!result.Succeeded)
@@ -63,6 +64,27 @@ namespace NTierArchitectureServer.Business.Services.AuthServices
             return resultDto;
         }
 
-        
+        public async Task SendConfirmEmail(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) throw new Exception("Kullanıcı bulunamadı!");
+
+            if (user.EmailConfirmed) throw new Exception("Mail adresi daha önce onaylanmış!");
+
+            var emailSetting = await _emailSettingService.GetFirstAsync();
+            var emailTemplate = await _emailTemplateService.GetByTitleAsync("Register");
+            SendEmailModel sendEmailModel = new();
+            sendEmailModel.Email = emailSetting.Email;
+            sendEmailModel.Password = emailSetting.Password;
+            sendEmailModel.Html = emailSetting.HTML;
+            sendEmailModel.SSL = emailSetting.SSL;
+            sendEmailModel.Smtp = emailSetting.SMTP;
+            sendEmailModel.Port = emailSetting.Port;
+            sendEmailModel.Subject = "Mail Onayı!";
+            sendEmailModel.Body = emailTemplate.Content.Replace("$url", "https://localhost7014/api/confirmMail/" + email);
+            sendEmailModel.Emails = new List<string> { email };
+
+            await EmailService.SendEmailAsync(sendEmailModel);
+        }
     }
 }

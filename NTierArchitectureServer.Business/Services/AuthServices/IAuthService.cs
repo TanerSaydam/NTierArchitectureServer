@@ -11,6 +11,7 @@ namespace NTierArchitectureServer.Business.Services.AuthServices
     {
         Task<ResultDto> RegisterAsync(RegisterDto registerDto);
         Task LoginAsync(LoginDto loginDto);
+        Task SendConfirmEmail(string email);
         
     }
 }

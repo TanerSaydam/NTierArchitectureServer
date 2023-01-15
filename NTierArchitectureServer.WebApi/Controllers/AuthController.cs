@@ -18,7 +18,7 @@ namespace NTierArchitectureServer.WebApi.Controllers
             _authService = authService;
         }
 
-        [HttpPost]
+        [HttpPost("[action]")]
         public async Task<IActionResult> Register(RegisterDto registerDto)
         {
             ResultDto result = await _authService.RegisterAsync(registerDto);
@@ -34,6 +34,13 @@ namespace NTierArchitectureServer.WebApi.Controllers
             await _authService.LoginAsync(loginDto);
             //düzeltilecek
             return Ok();
+        }
+
+        [HttpGet("[action]/{email}")]
+        public async Task<IActionResult> SendConfirmMail(string email)
+        {
+            await _authService.SendConfirmEmail(email);
+            return NoContent();
         }
     }
 }
