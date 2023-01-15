@@ -19,6 +19,17 @@ namespace NTierArchitectureServer.Business.Services.AuthServices
             _emailTemplateService = emailTemplateService;
         }
 
+        public async Task ConfirmEmail(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) throw new Exception("Kullanıcı bulunamadı!");
+
+            if (user.EmailConfirmed) throw new Exception("Mail adresi zaten onaylanmış!");
+
+            user.EmailConfirmed = true;
+            await _userManager.UpdateAsync(user);
+        }
+
         public async Task LoginAsync(LoginDto loginDto)
         {
             var user = await _userManager.FindByEmailAsync(loginDto.EmailorUserName);
@@ -27,6 +38,10 @@ namespace NTierArchitectureServer.Business.Services.AuthServices
 
             if (user == null)
                 throw new Exception("Kullanıcı bulunamadı!");
+
+            var checkPassword = await _userManager.CheckPasswordAsync(user,loginDto.Password);
+
+            if (!checkPassword) throw new Exception("Şifre bilgisi hatalı!");
 
             //token işlemleri
         }
@@ -64,15 +79,39 @@ namespace NTierArchitectureServer.Business.Services.AuthServices
             return resultDto;
         }
 
+        public async Task SendResetPasswordEmail(string email)
+        {
+            var user = await CheckUserWithEmail(email);
+
+            Random r = new();
+            int randNum = r.Next(1000000);
+            string resetPasswordCode = randNum.ToString("D6");
+
+            user.ResetPasswordCode = resetPasswordCode;
+            await _userManager.UpdateAsync(user);
+
+            SendEmailModel sendEmailModel = await GetSendEmailModel("Reset Password","Şifre Yenileme", new List<string> { email });
+            sendEmailModel.Body = sendEmailModel.Body.Replace("$code", resetPasswordCode);
+
+            await EmailService.SendEmailAsync(sendEmailModel);
+        }
+
         public async Task SendConfirmEmail(string email)
         {
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null) throw new Exception("Kullanıcı bulunamadı!");
+            var user = await CheckUserWithEmail(email);
 
             if (user.EmailConfirmed) throw new Exception("Mail adresi daha önce onaylanmış!");
 
+           SendEmailModel sendEmailModel = await GetSendEmailModel("Register", "Mail Onayı", new List<string> { email });
+            sendEmailModel.Body = sendEmailModel.Body.Replace("$url", "https://localhost7014/api/confirmMail/" + email);
+
+            await EmailService.SendEmailAsync(sendEmailModel);
+        }
+
+        public async Task<SendEmailModel> GetSendEmailModel(string title, string subject, List<string> emails)
+        {
             var emailSetting = await _emailSettingService.GetFirstAsync();
-            var emailTemplate = await _emailTemplateService.GetByTitleAsync("Register");
+            var emailTemplate = await _emailTemplateService.GetByTitleAsync(title);
             SendEmailModel sendEmailModel = new();
             sendEmailModel.Email = emailSetting.Email;
             sendEmailModel.Password = emailSetting.Password;
@@ -80,11 +119,35 @@ namespace NTierArchitectureServer.Business.Services.AuthServices
             sendEmailModel.SSL = emailSetting.SSL;
             sendEmailModel.Smtp = emailSetting.SMTP;
             sendEmailModel.Port = emailSetting.Port;
-            sendEmailModel.Subject = "Mail Onayı!";
-            sendEmailModel.Body = emailTemplate.Content.Replace("$url", "https://localhost7014/api/confirmMail/" + email);
-            sendEmailModel.Emails = new List<string> { email };
+            sendEmailModel.Subject = subject;
+            sendEmailModel.Body = emailTemplate.Content;
+            sendEmailModel.Emails = emails;
 
-            await EmailService.SendEmailAsync(sendEmailModel);
+            return sendEmailModel;
+        }
+
+        public async Task<AppUser> CheckUserWithEmail(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) throw new Exception("Kullanıcı bulunamadı!");
+
+            return user;
+        }
+
+        public async Task CheckResetPasswordCode(string email, string code)
+        {
+            var user = await CheckUserWithEmail(email);
+            if (user.ResetPasswordCode != code) throw new Exception("Kodunuz geçerli değil!");            
+        }
+
+        public async Task ResetPassword(string email, string code, string password)
+        {
+            var user = await CheckUserWithEmail(email);
+            if (user.ResetPasswordCode != code) throw new Exception("Kodunuz geçerli değil!");
+            user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, password);
+            user.ResetPasswordCode = null;
+
+            await _userManager.UpdateAsync(user);
         }
     }
 }

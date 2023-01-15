@@ -66,6 +66,8 @@ namespace NTierArchitectureServer.Business.Services.EmailTemplateServices
         {
             var emailTemplate = await _emailTemplateRepository.FindFirstAsync(p => p.Title == title);
 
+            if (emailTemplate == null) return null;
+
             return new EmailTemplateDto
             {
                 Id = emailTemplate.Id.ToString(),

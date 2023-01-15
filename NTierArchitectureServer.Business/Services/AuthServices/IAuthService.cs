@@ -1,9 +1,4 @@
 ﻿using NTierArchitectureServer.Business.Services.AuthServices.Dtos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NTierArchitectureServer.Business.Services.AuthServices
 {
@@ -12,6 +7,9 @@ namespace NTierArchitectureServer.Business.Services.AuthServices
         Task<ResultDto> RegisterAsync(RegisterDto registerDto);
         Task LoginAsync(LoginDto loginDto);
         Task SendConfirmEmail(string email);
-        
+        Task ConfirmEmail(string email);
+        Task SendResetPasswordEmail(string email);
+        Task CheckResetPasswordCode(string email, string code);
+        Task ResetPassword(string email, string code, string password);
     }
 }

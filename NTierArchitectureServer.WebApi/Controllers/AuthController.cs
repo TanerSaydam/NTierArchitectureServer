@@ -42,5 +42,33 @@ namespace NTierArchitectureServer.WebApi.Controllers
             await _authService.SendConfirmEmail(email);
             return NoContent();
         }
+
+        [HttpGet("[action]/{email}")]
+        public async Task<IActionResult> ConfirmEmail(string email)
+        {
+            await _authService.ConfirmEmail(email);
+            return NoContent(); 
+        }
+
+        [HttpGet("[action]/{email}")]
+        public async Task<IActionResult> SendResetPasswordEmail(string email)
+        {
+            await _authService.SendResetPasswordEmail(email);
+            return NoContent();
+        }
+        
+        [HttpGet("[action]/{email}/{code}")]
+        public async Task<IActionResult> CheckResetPasswordCode(string email, string code)
+        {
+            await _authService.CheckResetPasswordCode(email,code);
+            return NoContent();
+        }
+
+        [HttpGet("[action]/{email}/{code}/{password}")]
+        public async Task<IActionResult> ResetPassword(string email, string code, string password)
+        {
+            await _authService.ResetPassword(email, code, password);
+            return NoContent();
+        }
     }
 }
