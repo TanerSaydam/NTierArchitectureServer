@@ -40,24 +40,43 @@ namespace NTierArchitectureServer.Business.Services.EmailTemplateServices
             await _unitOfWork.SaveChangesAsync();            
         }
 
-        public IQueryable<EmailTemplate> GetAll()
+        public IList<EmailTemplateDto> GetAll()
         {
-            return _emailTemplateRepository.GetAll();
+            return _emailTemplateRepository.GetAll(false).Select(s=> new EmailTemplateDto
+            {
+                Id = s.Id.ToString(),
+                Title = s.Title,
+                Content = Encoding.UTF8.GetString(s.Content)
+            }).ToList();
         }
 
-        public async Task<EmailTemplate> GetByIdAsync(string id)
+        public async Task<EmailTemplateDto> GetByIdAsync(string id)
         {
-            return await _emailTemplateRepository.GetByIdAsync(id);
+            var emailTemplate = await _emailTemplateRepository.GetByIdAsync(id);
+
+            return new EmailTemplateDto
+            {
+                Id = emailTemplate.Id.ToString(),
+                Title = emailTemplate.Title,
+                Content = Encoding.UTF8.GetString(emailTemplate.Content)
+            };
         }
 
-        public async Task<EmailTemplate> GetByTitleAsync(string title)
+        public async Task<EmailTemplateDto> GetByTitleAsync(string title)
         {
-            return await _emailTemplateRepository.FindFirstAsync(p => p.Title == title);
+            var emailTemplate = await _emailTemplateRepository.FindFirstAsync(p => p.Title == title);
+
+            return new EmailTemplateDto
+            {
+                Id = emailTemplate.Id.ToString(),
+                Title = emailTemplate.Title,
+                Content = Encoding.UTF8.GetString(emailTemplate.Content)
+            };
         }
 
-        public async Task UpdateAsync(EmailTemplateDto emailTemplateDto, string id)
+        public async Task UpdateAsync(EmailTemplateDto emailTemplateDto)
         {
-            EmailTemplate emailTemplate = await _emailTemplateRepository.GetByIdAsync(id);
+            EmailTemplate emailTemplate = await _emailTemplateRepository.GetByIdAsync(emailTemplateDto.Id);
 
             if (emailTemplate.Title != emailTemplateDto.Title)
                 await CheckTitle(emailTemplateDto.Title);

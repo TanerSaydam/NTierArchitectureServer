@@ -4,5 +4,6 @@ namespace NTierArchitectureServer.Entities.Models.Identity
 {
     public class AppUser : IdentityUser<string>
     {
+        public byte[] ProfileImage { get; set; }
     }
 }

@@ -7,10 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.2.2" />
+    <PackageReference Include="GenericFileService" Version="1.0.3" />
+    <PackageReference Include="MimeTypeMapOfficial" Version="1.0.17" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NTierArchitectureServer.Core\NTierArchitectureServer.Core.csproj" />
     <ProjectReference Include="..\NTierArchitectureServer.DataAccess\NTierArchitectureServer.DataAccess.csproj" />
     <ProjectReference Include="..\NTierArchitectureServer.Entities\NTierArchitectureServer.Entities.csproj" />
   </ItemGroup>

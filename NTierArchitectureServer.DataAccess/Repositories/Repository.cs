@@ -60,28 +60,45 @@ namespace NTierArchitectureServer.DataAccess.Repositories
         #endregion
 
         #region Queries
-        public async Task<T> FindFirstAsync(Expression<Func<T, bool>> expression)
+        public async Task<T> FindFirstAsync(Expression<Func<T, bool>> expression, bool tracking = true)
         {
-            return await Entity.FirstOrDefaultAsync(expression);
+            if (!tracking) { 
+                var query = await Entity.AsNoTracking().FirstOrDefaultAsync(expression);
+                return query;
+            }
+            return await Entity.FirstOrDefaultAsync(expression);            
         }
 
-        public async Task<T> GetFirstAsync()
+        public async Task<T> GetFirstAsync(bool tracking = true)
         {
+            if (!tracking)
+            {
+                var query = await Entity.AsNoTracking().FirstOrDefaultAsync();
+                return query;
+            }
             return await Entity.FirstOrDefaultAsync();
         }
 
-        public IQueryable<T> GetAll()
+        public IQueryable<T> GetAll(bool tracking = true)
         {
-            return Entity.AsQueryable();
+            var query = Entity.AsQueryable();
+            if (!tracking)
+                query = query.AsNoTracking();
+            return query;
         }
 
-        public IQueryable<T> GetWhere(Expression<Func<T, bool>> expression)
+        public IQueryable<T> GetWhere(Expression<Func<T, bool>> expression, bool tracking = true)
         {
-            return Entity.Where(expression);
+            var query = Entity.Where(expression);
+            if (!tracking)
+                query = query.AsNoTracking();
+            return query;
         }
 
-        public async Task<T> GetByIdAsync(string id)
+        public async Task<T> GetByIdAsync(string id, bool tracking = true)
         {
+            if (!tracking)
+                return await Entity.AsNoTracking().FirstOrDefaultAsync(p=> p.Id == Guid.Parse(id));
             return await Entity.FindAsync(Guid.Parse(id));
         }
         #endregion

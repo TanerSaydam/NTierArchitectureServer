@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using GenericFileService.Files;
+using Microsoft.AspNetCore.Identity;
 using NTierArchitectureServer.Business.Services.AuthServices.Dtos;
+using NTierArchitectureServer.Business.Services.UserServices.Dtos;
 using NTierArchitectureServer.Entities.Models.Identity;
 using System;
 using System.Collections.Generic;
@@ -60,5 +62,7 @@ namespace NTierArchitectureServer.Business.Services.AuthServices
             }           
             return resultDto;
         }
+
+        
     }
 }

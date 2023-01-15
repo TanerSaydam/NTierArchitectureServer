@@ -17,11 +17,11 @@ namespace NTierArchitectureServer.DataAccess.Repositories
         #endregion
 
         #region Queries
-        IQueryable<T> GetAll();
-        IQueryable<T> GetWhere(Expression<Func<T, bool>> expression);
-        Task<T> GetByIdAsync(string id);
-        Task<T> FindFirstAsync(Expression<Func<T, bool>> expression);
-        Task<T> GetFirstAsync();
+        IQueryable<T> GetAll(bool tracking = true);
+        IQueryable<T> GetWhere(Expression<Func<T, bool>> expression, bool tracking = true);
+        Task<T> GetByIdAsync(string id, bool tracking = true);
+        Task<T> FindFirstAsync(Expression<Func<T, bool>> expression, bool tracking = true);
+        Task<T> GetFirstAsync(bool tracking = true);
         #endregion
     }
 }

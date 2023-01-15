@@ -2,11 +2,15 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using NTierArchitectureServer.Business.MappingProfiles;
 using NTierArchitectureServer.Business.Services.AuthServices;
 using NTierArchitectureServer.Business.Services.AuthServices.Validators;
 using NTierArchitectureServer.Business.Services.EmailSettingServices;
 using NTierArchitectureServer.Business.Services.EmailSettingServices.Validators;
 using NTierArchitectureServer.Business.Services.EmailTemplateServices;
+using NTierArchitectureServer.Business.Services.UserServices;
+using NTierArchitectureServer.Business.Services.UserServices.Validators;
+using NTierArchitectureServer.Core.Exceptions;
 using NTierArchitectureServer.Core.Validation;
 using NTierArchitectureServer.DataAccess.Context;
 using NTierArchitectureServer.DataAccess.Repositories;
@@ -29,6 +33,13 @@ builder.Services.AddScoped<IEmailTemplateRepository, EmailTemplateRepository>();
 builder.Services.AddScoped<IEmailSettingService,EmailSettingService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailTemplateService, EmailTemplateService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+#endregion
+
+#region Core Dependency Injection
+builder.Services.AddTransient<ExceptionHandler>();
 #endregion
 
 #region ConfigureOptions
@@ -54,6 +65,7 @@ builder.Services.AddControllers(options=> options.Filters.Add<ValidationFilter>(
     .RegisterValidatorsFromAssemblyContaining<RegisterValidator>()
     .RegisterValidatorsFromAssemblyContaining<LoginValidator>()
     .RegisterValidatorsFromAssemblyContaining<EmailSettingValidator>()
+    .RegisterValidatorsFromAssemblyContaining<ChangeUserProfileImageValidator>()
     )
     .ConfigureApiBehaviorOptions(options=> options.SuppressModelStateInvalidFilter = true);
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -112,5 +124,7 @@ using (var scope = app.Services.CreateScope())
         }, "Password12*").Wait();
 
 }
+
+app.UseMiddleware<ExceptionHandler>();
 
 app.Run();
