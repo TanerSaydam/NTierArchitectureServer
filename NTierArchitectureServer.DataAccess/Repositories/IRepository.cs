@@ -19,6 +19,7 @@ namespace NTierArchitectureServer.DataAccess.Repositories
         #region Queries
         IQueryable<T> GetAll();
         IQueryable<T> GetWhere(Expression<Func<T, bool>> expression);
+        Task<T> GetByIdAsync(string id);
         Task<T> FindFirstAsync(Expression<Func<T, bool>> expression);
         Task<T> GetFirstAsync();
         #endregion

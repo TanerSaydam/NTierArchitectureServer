@@ -5,10 +5,13 @@ using Microsoft.Extensions.Options;
 using NTierArchitectureServer.Business.Services.AuthServices;
 using NTierArchitectureServer.Business.Services.AuthServices.Validators;
 using NTierArchitectureServer.Business.Services.EmailSettingServices;
+using NTierArchitectureServer.Business.Services.EmailSettingServices.Validators;
+using NTierArchitectureServer.Business.Services.EmailTemplateServices;
 using NTierArchitectureServer.Core.Validation;
 using NTierArchitectureServer.DataAccess.Context;
 using NTierArchitectureServer.DataAccess.Repositories;
 using NTierArchitectureServer.DataAccess.Repositories.EmailSettingRepository;
+using NTierArchitectureServer.DataAccess.Repositories.EmailTemplateRepository;
 using NTierArchitectureServer.Entities.Models;
 using NTierArchitectureServer.Entities.Models.Identity;
 using NTierArchitectureServer.Entities.Options;
@@ -19,11 +22,13 @@ var builder = WebApplication.CreateBuilder(args);
 #region DataAccess Dependency Injection
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IEmailSettingRepository, EmailSettingRepository>();
+builder.Services.AddScoped<IEmailTemplateRepository, EmailTemplateRepository>();
 #endregion
 
 #region Business Dependency Injection
 builder.Services.AddScoped<IEmailSettingService,EmailSettingService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEmailTemplateService, EmailTemplateService>();
 #endregion
 
 #region ConfigureOptions
@@ -48,6 +53,7 @@ builder.Services.AddControllers(options=> options.Filters.Add<ValidationFilter>(
     .AddFluentValidation(configuration => configuration
     .RegisterValidatorsFromAssemblyContaining<RegisterValidator>()
     .RegisterValidatorsFromAssemblyContaining<LoginValidator>()
+    .RegisterValidatorsFromAssemblyContaining<EmailSettingValidator>()
     )
     .ConfigureApiBehaviorOptions(options=> options.SuppressModelStateInvalidFilter = true);
 #pragma warning restore CS0618 // Type or member is obsolete

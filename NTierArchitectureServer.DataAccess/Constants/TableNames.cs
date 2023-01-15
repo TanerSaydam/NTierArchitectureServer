@@ -9,5 +9,6 @@ namespace NTierArchitectureServer.DataAccess.Constants
     internal static class TableNames
     {
         internal const string EmailSettings = nameof(EmailSettings);
+        internal const string EmailTemplates = nameof(EmailTemplates);
     }
 }

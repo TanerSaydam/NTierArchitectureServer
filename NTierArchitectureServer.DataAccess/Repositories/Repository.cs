@@ -79,6 +79,11 @@ namespace NTierArchitectureServer.DataAccess.Repositories
         {
             return Entity.Where(expression);
         }
+
+        public async Task<T> GetByIdAsync(string id)
+        {
+            return await Entity.FindAsync(Guid.Parse(id));
+        }
         #endregion
 
 
