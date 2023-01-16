@@ -29,6 +29,7 @@ namespace NTierArchitectureServer.Core.Security
             {
                 new Claim(JwtRegisteredClaimNames.Sub,user.UserName),
                 new Claim(JwtRegisteredClaimNames.Email,user.Email),
+                new Claim(ClaimTypes.Name, user.Id)
             };
 
             var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey)), SecurityAlgorithms.HmacSha256);

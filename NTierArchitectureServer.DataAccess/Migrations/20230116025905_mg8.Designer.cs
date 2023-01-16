@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NTierArchitectureServer.DataAccess.Context;
 
@@ -11,9 +12,11 @@ using NTierArchitectureServer.DataAccess.Context;
 namespace NTierArchitectureServer.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230116025905_mg8")]
+    partial class mg8
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -203,43 +206,6 @@ namespace NTierArchitectureServer.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("NTierArchitectureServer.Entities.Models.Logs.LogCategory", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Type")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("LogCategories", (string)null);
-                });
-
-            modelBuilder.Entity("NTierArchitectureServer.Entities.Models.Logs.LogCategory", b =>
-                {
-                    b.HasOne("NTierArchitectureServer.Entities.Models.Identity.AppUser", "AppUser")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("AppUser");
                 });
 #pragma warning restore 612, 618
         }

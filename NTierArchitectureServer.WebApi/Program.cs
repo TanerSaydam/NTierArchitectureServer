@@ -2,14 +2,17 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using NTierArchitectureServer.Business.MappingProfiles;
 using NTierArchitectureServer.Business.Services.AuthServices;
 using NTierArchitectureServer.Business.Services.AuthServices.Validators;
+using NTierArchitectureServer.Business.Services.CategoryServices;
 using NTierArchitectureServer.Business.Services.EmailSettingServices;
 using NTierArchitectureServer.Business.Services.EmailSettingServices.Validators;
 using NTierArchitectureServer.Business.Services.EmailTemplateServices;
+using NTierArchitectureServer.Business.Services.Logs.LogCategoryServices;
 using NTierArchitectureServer.Business.Services.UserServices;
 using NTierArchitectureServer.Business.Services.UserServices.Validators;
 using NTierArchitectureServer.Core.Exceptions;
@@ -17,12 +20,20 @@ using NTierArchitectureServer.Core.Security;
 using NTierArchitectureServer.Core.Validation;
 using NTierArchitectureServer.DataAccess.Context;
 using NTierArchitectureServer.DataAccess.Repositories;
+using NTierArchitectureServer.DataAccess.Repositories.CategoryRepository;
 using NTierArchitectureServer.DataAccess.Repositories.EmailSettingRepository;
 using NTierArchitectureServer.DataAccess.Repositories.EmailTemplateRepository;
+using NTierArchitectureServer.DataAccess.Repositories.Logs.LogCategoryRepository;
 using NTierArchitectureServer.Entities.Models;
 using NTierArchitectureServer.Entities.Models.Identity;
 using NTierArchitectureServer.Entities.Options;
 using NTierArchitectureServer.WebApi.Options;
+using Serilog;
+using Serilog.Context;
+using Serilog.Core;
+using Serilog.Sinks.MSSqlServer;
+using System.Collections.ObjectModel;
+using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +41,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IEmailSettingRepository, EmailSettingRepository>();
 builder.Services.AddScoped<IEmailTemplateRepository, EmailTemplateRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+builder.Services.AddScoped<ILogCategoryRepository, LogCategoryRepository>();
 #endregion
 
 #region Business Dependency Injection
@@ -37,6 +51,11 @@ builder.Services.AddScoped<IEmailSettingService,EmailSettingService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailTemplateService, EmailTemplateService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+builder.Services.AddScoped<ILogCategoryService, LogCategoryService>();
+
+builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 #endregion
@@ -82,9 +101,39 @@ builder.Services.AddControllers(options=> options.Filters.Add<ValidationFilter>(
 builder.Services.AddEndpointsApiExplorer();
 #endregion
 
+#region Log
+var columnOptions = new ColumnOptions
+{
+    AdditionalColumns = new Collection<SqlColumn>
+        {
+            new SqlColumn
+            {
+                ColumnName = "UserId",
+                PropertyName = "UserId",
+                DataType=SqlDbType.NVarChar,
+                DataLength = 164,
+                AllowNull = true,
+            }
+        }
+};
+
+Logger log = new LoggerConfiguration()
+    .WriteTo.MSSqlServer(
+    connectionString: builder.Configuration.GetConnectionString("SqlServer"),
+    tableName: "logs",
+    autoCreateSqlTable: true,
+    columnOptions: columnOptions
+    ).CreateLogger();
+
+
+builder.Host.UseSerilog(log);
+#endregion
+
 #region Swagger
 builder.Services.AddSwaggerGen(setup =>
 {
+    
+
     var jwtSecuritySheme = new OpenApiSecurityScheme
     {
         BearerFormat = "JWT",
@@ -118,6 +167,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
 
@@ -159,6 +210,14 @@ using (var scope = app.Services.CreateScope())
         }, "Password12*").Wait();
 
 }
+
+app.Use(async (context, next) =>
+{
+    var userId = context.User?.Identity?.IsAuthenticated != null || true ? context.User.Identity.Name : null;
+
+    IDisposable disposable = LogContext.PushProperty("UserId", userId);    
+    await next();
+});
 
 app.UseMiddleware<ExceptionHandler>();
 
