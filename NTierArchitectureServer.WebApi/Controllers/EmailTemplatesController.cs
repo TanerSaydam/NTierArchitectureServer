@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NTierArchitectureServer.Business.Services.EmailTemplateServices;
 using NTierArchitectureServer.Business.Services.EmailTemplateServices.Dtos;
 
@@ -6,6 +7,7 @@ namespace NTierArchitectureServer.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes ="Bearer")]
     public class EmailTemplatesController : ControllerBase
     {
         private readonly IEmailTemplateService _emailTemplateService;

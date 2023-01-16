@@ -1,8 +1,10 @@
 ﻿using GenericEmailService;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using NTierArchitectureServer.Business.Services.AuthServices.Dtos;
 using NTierArchitectureServer.Business.Services.EmailSettingServices;
 using NTierArchitectureServer.Business.Services.EmailTemplateServices;
+using NTierArchitectureServer.Core.Security;
 using NTierArchitectureServer.Entities.Models.Identity;
 
 namespace NTierArchitectureServer.Business.Services.AuthServices
@@ -12,11 +14,13 @@ namespace NTierArchitectureServer.Business.Services.AuthServices
         private readonly UserManager<AppUser> _userManager;
         private readonly IEmailSettingService _emailSettingService;
         private readonly IEmailTemplateService _emailTemplateService;
-        public AuthService(UserManager<AppUser> userManager, IEmailSettingService emailSettingService, IEmailTemplateService emailTemplateService)
+        private readonly ITokenHandler _tokenHandler;
+        public AuthService(UserManager<AppUser> userManager, IEmailSettingService emailSettingService, IEmailTemplateService emailTemplateService, ITokenHandler tokenHandler)
         {
             _userManager = userManager;
             _emailSettingService = emailSettingService;
             _emailTemplateService = emailTemplateService;
+            _tokenHandler = tokenHandler;
         }
 
         public async Task ConfirmEmail(string email)
@@ -30,7 +34,7 @@ namespace NTierArchitectureServer.Business.Services.AuthServices
             await _userManager.UpdateAsync(user);
         }
 
-        public async Task LoginAsync(LoginDto loginDto)
+        public async Task<string> LoginAsync(LoginDto loginDto)
         {
             var user = await _userManager.FindByEmailAsync(loginDto.EmailorUserName);
             if (user == null)
@@ -43,7 +47,8 @@ namespace NTierArchitectureServer.Business.Services.AuthServices
 
             if (!checkPassword) throw new Exception("Şifre bilgisi hatalı!");
 
-            //token işlemleri
+            string token = await _tokenHandler.CreateTokenAsync(user);
+            return token;
         }
 
         public async Task<ResultDto> RegisterAsync(RegisterDto registerDto)
@@ -148,6 +153,17 @@ namespace NTierArchitectureServer.Business.Services.AuthServices
             user.ResetPasswordCode = null;
 
             await _userManager.UpdateAsync(user);
+        }
+
+        public async Task<string> CreateNewToken(string refreshToken)
+        {
+            var user = await _userManager.Users.Where(p => p.RefreshToken == refreshToken).FirstOrDefaultAsync();
+            if (user == null) throw new Exception("Kullanıcı bulunamadı!");
+
+            if (user.RefreshTokenExpires < DateTime.Now) throw new Exception("Refresh token süreniz bitmiş!");
+
+            var token = await _tokenHandler.CreateTokenAsync(user);
+            return token;
         }
     }
 }

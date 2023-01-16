@@ -31,9 +31,8 @@ namespace NTierArchitectureServer.WebApi.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
-            await _authService.LoginAsync(loginDto);
-            //düzeltilecek
-            return Ok();
+            var token = await _authService.LoginAsync(loginDto);            
+            return Ok(new { Token = token });
         }
 
         [HttpGet("[action]/{email}")]
@@ -69,6 +68,13 @@ namespace NTierArchitectureServer.WebApi.Controllers
         {
             await _authService.ResetPassword(email, code, password);
             return NoContent();
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> CreateNewToken(RefreshTokenDto refreshToken)
+        {
+            var token = await _authService.CreateNewToken(refreshToken.RefreshToken);
+            return Ok(token);
         }
     }
 }

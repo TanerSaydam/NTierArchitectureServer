@@ -1,7 +1,9 @@
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using NTierArchitectureServer.Business.MappingProfiles;
 using NTierArchitectureServer.Business.Services.AuthServices;
 using NTierArchitectureServer.Business.Services.AuthServices.Validators;
@@ -11,6 +13,7 @@ using NTierArchitectureServer.Business.Services.EmailTemplateServices;
 using NTierArchitectureServer.Business.Services.UserServices;
 using NTierArchitectureServer.Business.Services.UserServices.Validators;
 using NTierArchitectureServer.Core.Exceptions;
+using NTierArchitectureServer.Core.Security;
 using NTierArchitectureServer.Core.Validation;
 using NTierArchitectureServer.DataAccess.Context;
 using NTierArchitectureServer.DataAccess.Repositories;
@@ -40,10 +43,17 @@ builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
 #region Core Dependency Injection
 builder.Services.AddTransient<ExceptionHandler>();
+builder.Services.AddScoped<ITokenHandler, TokenHandler>();
 #endregion
 
 #region ConfigureOptions
 builder.Services.ConfigureOptions<DatabaseOptionsSetup>();
+#endregion
+
+#region Authentication
+builder.Services.ConfigureOptions<JwtOptionsSetup>();
+builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
 #endregion
 
 #region DbContext
@@ -73,7 +83,31 @@ builder.Services.AddEndpointsApiExplorer();
 #endregion
 
 #region Swagger
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(setup =>
+{
+    var jwtSecuritySheme = new OpenApiSecurityScheme
+    {
+        BearerFormat = "JWT",
+        Name = "JWT Authentication",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = JwtBearerDefaults.AuthenticationScheme,
+        Description = "Put **_ONLY_** yourt JWT Bearer token on textbox below!",
+
+        Reference = new OpenApiReference
+        {
+            Id = JwtBearerDefaults.AuthenticationScheme,
+            Type = ReferenceType.SecurityScheme
+        }
+    };
+
+    setup.AddSecurityDefinition(jwtSecuritySheme.Reference.Id, jwtSecuritySheme);
+
+    setup.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { jwtSecuritySheme, Array.Empty<string>() }
+    });
+});
 #endregion
 
 var app = builder.Build();
@@ -87,6 +121,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
