@@ -30,4 +30,8 @@
     <ProjectReference Include="..\NTierArchitectureServer.DataAccess\NTierArchitectureServer.DataAccess.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\users\" />
+  </ItemGroup>
+
 </Project>

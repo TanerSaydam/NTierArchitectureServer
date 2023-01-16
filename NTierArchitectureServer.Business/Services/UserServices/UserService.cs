@@ -35,6 +35,15 @@ namespace NTierArchitectureServer.Business.Services.UserServices
             if (user == null) throw new Exception("Kullanıcı bulunamadı!");
 
             user.ProfileImage = FileService.FileConvertByteArrayToDatabase(changeUserProfileImageDto.File);
+            user.ProfileImageUrl = FileService.FileSaveToServer(changeUserProfileImageDto.File, "./wwwroot/images/users/");
+
+            //FileSaveToFtpModel fileSaveToFtpModel = new(
+            //    "ftp adresi //ftp://ftp.tanersaydam.com/wwwroot/images/users/",
+            //    "kullanıcı adı",
+            //    "şifre");
+
+            //user.ProfileImageUrl = FileService.FileSaveToFtp(changeUserProfileImageDto.File,fileSaveToFtpModel);
+
             await _userManager.UpdateAsync(user);
         }
     }
